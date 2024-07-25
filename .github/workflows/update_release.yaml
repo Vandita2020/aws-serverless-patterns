@@ -11,9 +11,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        
+      - name: Install GitHub CLI
+        uses: actions/setup-github-cli@v2
 
-      - name: Validate
-        uses: actions/github-script@v3
+      - name: Setup GITHUB_TOKEN
+        uses: actions/setup-cli@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
