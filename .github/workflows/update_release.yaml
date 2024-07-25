@@ -8,13 +8,15 @@ on:
 jobs:
   update-release:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
-       - name: Validate
-        uses: cli/gh-action@v3
+      - name: Install GitHub CLII
+        uses: actions/setup-github-cli@v2
+
+      - name: Setup GITHUB_TOKEN
+        uses: actions/setup-cli@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
