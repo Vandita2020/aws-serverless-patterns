@@ -11,10 +11,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
        - name: Validate
-        uses: cli/gh-action@v3
+        uses: cli/gh-action@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
