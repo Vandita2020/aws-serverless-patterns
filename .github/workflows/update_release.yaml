@@ -24,14 +24,20 @@ jobs:
         id: get_changes
         run: |
           latest_release=${{ steps.get_latest_release.outputs.latest_release }}
-          git fetch origin $latest_release --depth=1
-          changed_files=$(git diff --name-only $latest_release HEAD)
-          echo "::set-output name=changed_files::$(cat changed_files.txt | tr '\n' ' ')"
+          if git ls-remote --exit-code --tags origin $latest_release; then
+            git fetch origin $latest_release --depth=1
+            changed_files=$(git diff --name-only $latest_release HEAD)
+            echo "::set-output name=changed_files::$changed_files"
+          else
+            echo "::set-output name=changed_files::"
+            echo "Tag $latest_release not found in remote repository"
+          fi
 
       - name: Upload changed files to the release
         if: steps.get_changes.outputs.changed_files != ''
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           latest_release=${{ steps.get_latest_release.outputs.latest_release }}
           changed_files=${{ steps.get_changes.outputs.changed_files }}
