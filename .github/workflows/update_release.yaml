@@ -32,7 +32,7 @@ jobs:
             echo "::set-output name=changed_files::"
             echo "Tag $latest_release not found in remote repository"
           fi
-          
+
       - name: Upload changed files to the release
         if: steps.get_changes.outputs.changed_files != ''
         env:
