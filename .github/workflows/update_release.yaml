@@ -18,7 +18,13 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           latest_release=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
-          echo "::set-output name=latest_release::$latest_release"
+          echo "Latest release tag: $latest_release"
+          echo "latest_release=${latest_release}" >> $GITHUB_ENV
+
+      - name: Fetch the latest release tag from remote
+        if: env.latest_release != ''
+        run: |
+          git fetch origin refs/tags/${{ env.latest_release }}:refs/tags/${{ env.latest_release }}
 
       - name: Get changed files since latest release
         id: get_changes
