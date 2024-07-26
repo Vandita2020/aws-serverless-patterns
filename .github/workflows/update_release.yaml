@@ -13,13 +13,13 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install GitHub CLI
-        uses: actions/setup-cli@v2
+        uses: github/cli@latest
 
       - name: Setup GITHUB_TOKEN
-        uses: actions/setup-github-cli@v2
+        uses: github/cli@latest
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-
+          
       - name: Get the latest release tag
         id: get_latest_release
         run: |
