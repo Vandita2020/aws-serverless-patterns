@@ -32,7 +32,6 @@ jobs:
         if: steps.get_changes.outputs.changed_files != ''
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_TOKEN: ${{ github.token }}
         run: |
           latest_release=${{ steps.get_latest_release.outputs.latest_release }}
           changed_files=${{ steps.get_changes.outputs.changed_files }}
