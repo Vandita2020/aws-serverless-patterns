@@ -23,16 +23,15 @@ jobs:
       - name: Get changed files since latest release
         id: get_changes
         run: |
-          latest_release=${{ steps.get_latest_release.outputs.latest_release }}
-          if git ls-remote --exit-code --tags origin $latest_release; then
-            git fetch origin $latest_release --depth=1
-            changed_files=$(git diff --name-only $latest_release HEAD)
-            echo "::set-output name=changed_files::$changed_files"
+          if [ -n "${{ env.latest_release }}" ]; then
+            git fetch origin ${{ env.latest_release }} --depth=1
+            changed_files=$(git diff --name-only ${{ env.latest_release }} HEAD)
+            echo "changed_files=${changed_files}" >> $GITHUB_ENV
           else
-            echo "::set-output name=changed_files::"
-            echo "Tag $latest_release not found in remote repository"
+            echo "changed_files=" >> $GITHUB_ENV
+            echo "Tag ${{ env.latest_release }} not found in remote repository"
           fi
-
+          
       - name: Upload changed files to the release
         if: steps.get_changes.outputs.changed_files != ''
         env:
