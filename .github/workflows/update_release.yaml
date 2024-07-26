@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-github-cli@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-
+          
       - name: Get the latest release tag
         id: get_latest_release
         run: |
