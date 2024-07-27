@@ -46,17 +46,14 @@ jobs:
           echo "changed_files=${changed_files}" >> $GITHUB_ENV
           
       - name: Upload changed files to the release
-        if: steps.get_changes.outputs.changed_files != ''
+        if: env.changed_files != ''
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          latest_release=${{ steps.get_latest_release.outputs.latest_release }}
-          changed_files=${{ steps.get_changes.outputs.changed_files }}
-
-          for file in $changed_files; do
+          IFS=',' read -r -a files <<< "${{ env.changed_files }}"
+          for file in "${files[@]}"; do
             if [ -f "$file" ]; then
-              gh release upload $latest_release $file --clobber
-              echo "Uploaded $file to release $latest_release"
+              gh release upload ${{ env.latest_release }} "$file" --clobber
+              echo "Uploaded $file to release ${{ env.latest_release }}"
             fi
           done
