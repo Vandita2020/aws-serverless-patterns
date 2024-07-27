@@ -53,7 +53,9 @@ jobs:
           IFS=',' read -r -a files <<< "${{ env.changed_files }}"
           for file in "${files[@]}"; do
             if [ -f "$file" ]; then
+              echo "Uploading $file to release ${{ env.latest_release }}"
               gh release upload ${{ env.latest_release }} "$file" --clobber
-              echo "Uploaded $file to release ${{ env.latest_release }}"
+            else
+              echo "File $file not found"
             fi
           done
