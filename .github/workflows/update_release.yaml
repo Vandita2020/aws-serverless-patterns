@@ -39,23 +39,40 @@ jobs:
             echo "" > changed_files.txt
           fi
 
-      - name: Read changed files
-        id: read_changed_files
+      - name: Identify changed folders
+        id: identify_folders
         run: |
-          changed_files=$(paste -sd, changed_files.txt)
-          echo "changed_files=${changed_files}" >> $GITHUB_ENV
-          
-      - name: Upload changed files to the release
-        if: env.changed_files != ''
+          if [ -s changed_files.txt ]; then
+            changed_folders=$(awk -F/ '{print $1}' changed_files.txt | sort | uniq)
+            echo "Changed folders: $changed_folders"
+            echo "$changed_folders" > changed_folders.txt
+          else
+            echo "No changed files to process"
+            echo "" > changed_folders.txt
+          fi
+
+      - name: Archive changed folders
+        run: |
+          while IFS= read -r folder; do
+            if [ -d "$folder" ]; then
+              tar -cvf "$folder.tar" "$folder"
+              echo "Created archive for $folder"
+            else
+              echo "Folder $folder not found"
+            fi
+          done < changed_folders.txt
+
+      - name: Upload changed archives to the release
+        if: env.latest_release != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          IFS=',' read -r -a files <<< "${{ env.changed_files }}"
-          for file in "${files[@]}"; do
-            if [ -f "$file" ]; then
-              echo "Uploading $file to release ${{ env.latest_release }}"
-              gh release upload ${{ env.latest_release }} "$file" --clobber
+          while IFS= read -r folder; do
+            archive="$folder.tar"
+            if [ -f "$archive" ]; then
+              echo "Uploading $archive to release ${{ env.latest_release }}"
+              gh release upload ${{ env.latest_release }} "$archive" --clobber
             else
-              echo "File $file not found"
+              echo "Archive $archive not found"
             fi
-          done
+          done < changed_folders.txt
